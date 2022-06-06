@@ -4,11 +4,10 @@ import "./Collaborator.css"
 
 
 const Collaborator = ( props ) => {
-    console.log("oi" + props.name + props.avatar_url)
-    return ( <div >
+    return ( <a href={props.url} target="_blank" className='collaborator'>
         <img src={props.avatar_url} alt="" />
-        <p>{props.name}</p>
-    </div> );
+        <p>{props.login}</p>
+    </a> );
 }
  
 export default Collaborator;

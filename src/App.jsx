@@ -2,10 +2,10 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { CgSearch } from "react-icons/cg";
 import { CgAdd } from "react-icons/cg";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 import Repository from "./components/Repository";
-import Collaborators from "./components/Collaborators";
+import Collaborator from "./components/Collaborator";
 
 import "./App.css";
 
@@ -18,7 +18,6 @@ function App() {
   });
   const [repositorySearched, setRepositorySearched] = useState([]);
   const [collaborators, setCollaborators] = useState([]);
-  const [onRouteSearch, setOnRouteSearch] = useState(true)
 
   const handleSearchClick = () => {
     axios
@@ -39,81 +38,71 @@ function App() {
           .catch((error) => console.log(error));
       })
       .catch((error) => console.log(error));
+    setSearch("")
   };
 
-  const handleAddCollaboratorClick = ( login, avatarUrl ) => {
-    setCollaborators(
-      [ ...collaborators, 
-        { "name": login, "avatar_url": avatarUrl }
-      ]);
+  const handleAddCollaboratorClick = (login, avatarUrl) => {
+    const newCollaborator = { login: login, avatar_url: avatarUrl };
+    if(!collaboratorAlreadyRegistered(newCollaborator)) setCollaborators( [
+      ...collaborators,
+      newCollaborator,
+    ]) 
+    else window.alert('Colaborador já registrado!')
   };
 
-  const handleClickOption = ( onRouteSearch ) => {
-    setOnRouteSearch(onRouteSearch)
+  const collaboratorAlreadyRegistered = ( newCollaborator ) => {
+    return collaborators.some( collaborator => {
+      return newCollaborator.login === collaborator.login;
+    })
   }
 
   return (
     <div className="container">
-
-      <div className="options">
-        <div 
-          className={onRouteSearch ? "ativo" : "desativado"}
-          onClick={() => handleClickOption(true)}>
-            <a href="/">Busque colaboradores!</a>
+      <div className="search-collabatorator">
+        <div className="search">
+          <input
+            type="text"
+            className="search-input"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <CgSearch className="search-icon" onClick={handleSearchClick} />
         </div>
         <div 
-          className={onRouteSearch ? "desativado" : "ativo"}
-          onClick={() => handleClickOption(false)}>
-            <a href="/collaborators">Veja os colaboradores!</a>
+          className="search-result">
+            
+          <img src={infoSearched.avatar_url} alt="" />
+          <h3>{infoSearched.login}</h3>
+          <CgAdd
+            className="add-collaborator"
+            onClick={() =>
+              handleAddCollaboratorClick(
+                infoSearched.login,
+                infoSearched.avatar_url
+              )
+            }
+          />
+          <div className="repos">
+            {repositorySearched.map((rep) => (
+              <Repository name={rep.name} key={rep.name} />
+            ))}
+          </div>
         </div>
       </div>
 
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <div className="search-repositories">
-                  <input
-                    type="text"
-                    className="search-input"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                  <CgSearch
-                    className="search-icon"
-                    onClick={handleSearchClick}
-                  />
-                </div>
-
-                <div className="search-result">
-                  <img src={infoSearched.avatar_url} alt="" />
-                  <h3>{infoSearched.login}</h3>
-                  <CgAdd
-                    className="add-collaborator"
-                    onClick={() =>
-                      handleAddCollaboratorClick(infoSearched.login, infoSearched.avatar_url)
-                    }
-                  />
-
-                  <div className="repos">
-                    {repositorySearched.map((rep) => (
-                      <Repository name={rep.name} key={rep.name} />
-                    ))}
-                  </div>
-                </div>
-              </>
-            }
+      <div className="collaborators">
+        <h2>Colaboradores</h2>
+        {
+        collaborators.map((collaborator) => (
+          <Collaborator
+            avatar_url={collaborator.avatar_url}
+            login={collaborator.login}
+            key={uuidv4()}
+            url={`https://github.com/${collaborator.login}`}
           />
-
-          <Route path="/collaborators" element={
-            <>
-              <Collaborators collaborators={collaborators} />
-            </>
-           } />
-        </Routes>
-      </Router>
+        ))
+        }
+      </div>
     </div>
   );
 }
