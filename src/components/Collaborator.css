@@ -1,15 +1,15 @@
-
 .collaborator {
     display: flex;
     
     justify-content: space-between;
     align-items: center;
 
-    border-bottom: 1px solid #2D333B;
+    border: 1px solid #2D333B;
     padding: 10px;
+    margin-bottom: 1px;
 
     text-decoration: none;
-    color: #000;
+    color: #1C2128;
 }
 
 .collaborator img {

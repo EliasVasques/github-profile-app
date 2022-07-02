@@ -4,7 +4,7 @@ import "./Repository.css"
 
 
 const Repository = ( { name } ) => {
-    return ( <div className='repositories'>
+    return ( <div className='repository'>
         <p>{name}</p>
     </div> );
 }
